@@ -1,10 +1,15 @@
 """A tiny todo API used as the demo target for ku coding agents."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="ku-agent-demo")
+
+STATIC_DIR = Path(__file__).parent / "static"
 
 
 class TodoIn(BaseModel):
@@ -30,6 +35,11 @@ def reset() -> None:
 @app.get("/")
 def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
+
+
+@app.get("/welcome", include_in_schema=False)
+def welcome() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/todos")

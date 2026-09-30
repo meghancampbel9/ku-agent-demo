@@ -23,3 +23,10 @@ def test_delete(client):
 
 def test_validation(client):
     assert client.post("/todos", json={"title": ""}).status_code == 422
+
+
+def test_welcome_page(client):
+    r = client.get("/welcome")
+    assert r.status_code == 200
+    assert r.headers["content-type"].startswith("text/html")
+    assert "Hey Meg!" in r.text
