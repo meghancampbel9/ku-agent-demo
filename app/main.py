@@ -32,6 +32,11 @@ def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
 
 
+@app.get("/hello")
+def hello() -> str:
+    return "hello world! this is sandboxed agent"
+
+
 @app.get("/todos")
 def list_todos() -> list[Todo]:
     return list(_todos.values())
