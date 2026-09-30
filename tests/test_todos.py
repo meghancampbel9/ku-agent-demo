@@ -4,6 +4,12 @@ def test_root(client):
     assert r.json() == {"service": "ku-agent-demo"}
 
 
+def test_health(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json() == {"status": "ok"}
+
+
 def test_create_and_list(client):
     r = client.post("/todos", json={"title": "write tests"})
     assert r.status_code == 201
