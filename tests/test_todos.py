@@ -23,3 +23,9 @@ def test_delete(client):
 
 def test_validation(client):
     assert client.post("/todos", json={"title": ""}).status_code == 422
+
+
+def test_goodbye(client):
+    r = client.get("/goodbye")
+    assert r.status_code == 200
+    assert r.json() == {"message": "goodbye world"}

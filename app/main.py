@@ -32,6 +32,11 @@ def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
 
 
+@app.get("/goodbye")
+def goodbye() -> dict[str, str]:
+    return {"message": "goodbye world"}
+
+
 @app.get("/todos")
 def list_todos() -> list[Todo]:
     return list(_todos.values())
