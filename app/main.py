@@ -32,6 +32,11 @@ def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
 
 
+@app.get("/health")
+def health() -> dict[str, str]:
+    return {"status": "ok"}
+
+
 @app.get("/todos")
 def list_todos() -> list[Todo]:
     return list(_todos.values())
