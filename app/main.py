@@ -32,6 +32,11 @@ def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
 
 
+@app.get("/version")
+def version() -> dict[str, str]:
+    return {"version": "0.1.0"}
+
+
 @app.get("/todos")
 def list_todos() -> list[Todo]:
     return list(_todos.values())
