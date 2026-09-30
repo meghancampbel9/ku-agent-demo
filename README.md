@@ -9,4 +9,4 @@ uv run pytest -q
 uv run uvicorn app.main:app --reload
 ```
 
-Endpoints: `GET /`, `GET /todos`, `POST /todos`, `GET /todos/{id}`, `DELETE /todos/{id}`.
+Endpoints: `GET /`, `GET /health`, `GET /todos`, `POST /todos`, `GET /todos/{id}`, `DELETE /todos/{id}`.
