@@ -1,7 +1,10 @@
 """A tiny todo API used as the demo target for ku coding agents."""
 from __future__ import annotations
 
-from fastapi import FastAPI, HTTPException
+from pathlib import Path
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="ku-agent-demo")
@@ -27,8 +30,14 @@ def reset() -> None:
     _next_id = 1
 
 
-@app.get("/")
-def root() -> dict[str, str]:
+STATIC_DIR = Path(__file__).parent / "static"
+
+
+@app.get("/", response_model=None)
+def root(request: Request) -> FileResponse | dict[str, str]:
+    """Landing page for browsers; JSON service info for everything else."""
+    if "text/html" in request.headers.get("accept", ""):
+        return FileResponse(STATIC_DIR / "index.html")
     return {"service": "ku-agent-demo"}
 
 
