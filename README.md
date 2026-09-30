@@ -9,4 +9,6 @@ uv run pytest -q
 uv run uvicorn app.main:app --reload
 ```
 
-Endpoints: `GET /`, `GET /todos`, `POST /todos`, `GET /todos/{id}`, `DELETE /todos/{id}`.
+Endpoints: `GET /`, `GET /todos`, `POST /todos`, `GET /todos/{id}`, `PATCH /todos/{id}`, `DELETE /todos/{id}`.
+
+A minimal web UI (plain HTML/JS, no build step) is served at `/ui`.

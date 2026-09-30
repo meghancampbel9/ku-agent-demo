@@ -23,3 +23,21 @@ def test_delete(client):
 
 def test_validation(client):
     assert client.post("/todos", json={"title": ""}).status_code == 422
+
+
+def test_patch_done(client):
+    tid = client.post("/todos", json={"title": "x"}).json()["id"]
+    r = client.patch(f"/todos/{tid}", json={"done": True})
+    assert r.status_code == 200
+    assert r.json()["done"] is True
+    assert client.get(f"/todos/{tid}").json()["done"] is True
+
+
+def test_patch_missing_returns_404(client):
+    assert client.patch("/todos/42", json={"done": True}).status_code == 404
+
+
+def test_ui_served(client):
+    r = client.get("/ui")
+    assert r.status_code == 200
+    assert "text/html" in r.headers["content-type"]

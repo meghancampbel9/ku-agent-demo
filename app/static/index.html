@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Todos</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 32rem; margin: 2rem auto; padding: 0 1rem; }
+  form { display: flex; gap: .5rem; }
+  input[type=text] { flex: 1; padding: .4rem; }
+  ul { list-style: none; padding: 0; }
+  li { display: flex; align-items: center; gap: .5rem; padding: .4rem 0; border-bottom: 1px solid #ddd; }
+  li span { flex: 1; }
+  li.done span { text-decoration: line-through; color: #888; }
+  #error { color: #b00; min-height: 1.2em; }
+</style>
+</head>
+<body>
+<h1>Todos</h1>
+<form id="form">
+  <input type="text" id="title" placeholder="What needs doing?" maxlength="200" required>
+  <button>Add</button>
+</form>
+<p id="error"></p>
+<ul id="list"></ul>
+<script>
+const list = document.getElementById("list");
+const error = document.getElementById("error");
+
+async function api(path, options) {
+  const r = await fetch(path, options);
+  if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.status === 204 ? null : r.json();
+}
+
+async function render() {
+  try {
+    const todos = await api("/todos");
+    list.replaceChildren(...todos.map(t => {
+      const li = document.createElement("li");
+      li.className = t.done ? "done" : "";
+      const box = document.createElement("input");
+      box.type = "checkbox";
+      box.checked = t.done;
+      box.onchange = () => act(() => api(`/todos/${t.id}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({done: box.checked}),
+      }));
+      const span = document.createElement("span");
+      span.textContent = t.title;  // textContent: never interpret titles as HTML
+      const del = document.createElement("button");
+      del.textContent = "Delete";
+      del.onclick = () => act(() => api(`/todos/${t.id}`, {method: "DELETE"}));
+      li.append(box, span, del);
+      return li;
+    }));
+    error.textContent = "";
+  } catch (e) { error.textContent = e.message; }
+}
+
+async function act(fn) {
+  try { await fn(); } catch (e) { error.textContent = e.message; return; }
+  render();
+}
+
+document.getElementById("form").onsubmit = e => {
+  e.preventDefault();
+  const title = document.getElementById("title");
+  act(() => api("/todos", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({title: title.value}),
+  })).then(() => { title.value = ""; });
+};
+
+render();
+</script>
+</body>
+</html>

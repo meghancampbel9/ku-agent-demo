@@ -1,15 +1,23 @@
 """A tiny todo API used as the demo target for ku coding agents."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
 app = FastAPI(title="ku-agent-demo")
+STATIC_DIR = Path(__file__).parent / "static"
 
 
 class TodoIn(BaseModel):
     title: str = Field(min_length=1, max_length=200)
     done: bool = False
+
+
+class TodoPatch(BaseModel):
+    done: bool
 
 
 class Todo(TodoIn):
@@ -30,6 +38,11 @@ def reset() -> None:
 @app.get("/")
 def root() -> dict[str, str]:
     return {"service": "ku-agent-demo"}
+
+
+@app.get("/ui", include_in_schema=False)
+def ui() -> FileResponse:
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/todos")
@@ -58,3 +71,11 @@ def delete_todo(todo_id: int) -> None:
     if todo_id not in _todos:
         raise HTTPException(status_code=404, detail="todo not found")
     del _todos[todo_id]
+
+
+@app.patch("/todos/{todo_id}")
+def update_todo(todo_id: int, patch: TodoPatch) -> Todo:
+    if todo_id not in _todos:
+        raise HTTPException(status_code=404, detail="todo not found")
+    _todos[todo_id] = _todos[todo_id].model_copy(update={"done": patch.done})
+    return _todos[todo_id]
